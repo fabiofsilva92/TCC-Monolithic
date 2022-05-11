@@ -3,7 +3,7 @@ package fatec.br.tccmonolitico.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
+
 
 @Entity(name = "cambio")
 public class Cambio implements Serializable {
@@ -21,11 +21,11 @@ public class Cambio implements Serializable {
     private String to;
 
     @Column(nullable = false)
-    private BigDecimal conversionFactor;
+    private Double conversionFactor;
 
     // não vai ser persistido no banco
     @org.springframework.data.annotation.Transient
-    private BigDecimal convertedValue;
+    private Double convertedValue;
 
     @org.springframework.data.annotation.Transient
     private String environment;
@@ -34,7 +34,7 @@ public class Cambio implements Serializable {
         super();
     }
 
-    public Cambio(Long id, String from, String to, BigDecimal conversionFactor, BigDecimal convertedValue,
+    public Cambio(Long id, String from, String to, Double conversionFactor, Double convertedValue,
                   String environment) {
         super();
         this.id = id;
@@ -69,19 +69,19 @@ public class Cambio implements Serializable {
         this.to = to;
     }
 
-    public BigDecimal getConversionFactor() {
+    public Double getConversionFactor() {
         return conversionFactor;
     }
 
-    public void setConversionFactor(BigDecimal conversionFactor) {
+    public void setConversionFactor(Double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
 
-    public BigDecimal getConvertedValue() {
+    public Double getConvertedValue() {
         return convertedValue;
     }
 
-    public void setConvertedValue(BigDecimal convertedValue) {
+    public void setConvertedValue(Double convertedValue) {
         this.convertedValue = convertedValue;
     }
 
