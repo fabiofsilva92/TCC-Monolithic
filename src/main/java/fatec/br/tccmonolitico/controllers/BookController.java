@@ -60,7 +60,16 @@ public class BookController {
     @GetMapping
     public ResponseEntity<List<BookDTO>> findAll() {
         List<BookDTO> listDTO = bookService.getListOfBooKDTO();
+        return ResponseEntity.ok().body(listDTO);
+    }
 
+    @GetMapping(value = "/time")
+    public ResponseEntity<List<BookDTO>> findAllTimeProcessed() {
+        Long start = System.nanoTime();
+        List<BookDTO> listDTO = bookService.getListOfBooKDTO();
+        Long end = System.nanoTime();
+        System.out.println("Tempo passado dentro no metodo :" + (end-start) + " nanossegundos");
+        System.out.println("Tempo passado dentro no metodo segundos :" + (end-start)*(Math.pow(10, -9)) + "s");
         return ResponseEntity.ok().body(listDTO);
     }
 

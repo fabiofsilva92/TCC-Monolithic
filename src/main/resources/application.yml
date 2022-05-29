@@ -1,9 +1,24 @@
 server:
   port: 8081
 
+topic:
+  name: test2
+
 spring:
   application:
     name: tcc-monolito
+
+  kafka:
+    consumer:
+      group-id: worker
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            value:
+              default:
+                type: fatec.br.tccmonolitico.dtos.MessageConsumerDTO
+    bootstrap-servers: localhost:9091
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
