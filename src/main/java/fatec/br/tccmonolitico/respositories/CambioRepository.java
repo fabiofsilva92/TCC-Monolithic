@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CambioRepository extends JpaRepository<Cambio, Long> {
 
-    Cambio findByFromAndTo(String from, String to);
+    Cambio findByFromAndTo(String from_currency, String to_currency);
 }

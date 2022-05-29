@@ -4,9 +4,7 @@ import fatec.br.tccmonolitico.dtos.BookDTO;
 import fatec.br.tccmonolitico.entities.Book;
 import fatec.br.tccmonolitico.entities.Cambio;
 import fatec.br.tccmonolitico.proxy.CambioProxy;
-import fatec.br.tccmonolitico.respositories.BookRepository;
 import fatec.br.tccmonolitico.services.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/book-service-mono")

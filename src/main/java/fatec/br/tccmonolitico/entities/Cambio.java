@@ -24,10 +24,10 @@ public class Cambio implements Serializable {
     private Double conversionFactor;
 
     // não vai ser persistido no banco
-    @org.springframework.data.annotation.Transient
+    @javax.persistence.Transient
     private Double convertedValue;
 
-    @org.springframework.data.annotation.Transient
+    @javax.persistence.Transient
     private String environment;
 
     public Cambio() {
