@@ -31,9 +31,9 @@ public class BookService {
     public List<BookDTO> getListOfBooKDTO(){
         List<Book> books = bookRepository.findAll();
 
-        List<BookDTO> collect = books.stream().map(b -> {
-            return new BookDTO(b);
-        }).collect(Collectors.toList());
+        List<BookDTO> collect = books.stream().map(b ->
+            new BookDTO(b)
+        ).collect(Collectors.toList());
 
         return collect;
     }

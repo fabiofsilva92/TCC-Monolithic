@@ -3,7 +3,9 @@ package fatec.br.tccmonolitico.consumer;
 import fatec.br.tccmonolitico.dtos.BookDTO;
 import fatec.br.tccmonolitico.dtos.MessageConsumerDTO;
 import fatec.br.tccmonolitico.dtos.enums.ServiceRequested;
+import fatec.br.tccmonolitico.entities.Cambio;
 import fatec.br.tccmonolitico.proxy.BookProxy;
+import fatec.br.tccmonolitico.proxy.CambioProxy;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,9 @@ public class KafkaMessageConsumer {
 
     @Autowired
     private BookProxy bookProxy;
+
+    @Autowired
+    private CambioProxy cambioProxy;
 
     private static final Logger log = LoggerFactory.getLogger(KafkaMessageConsumer.class);
 
@@ -64,17 +69,15 @@ public class KafkaMessageConsumer {
             case GET:
                 //todo something
                 Long start = System.nanoTime();
-                bookProxy.findAll();
-//                List<BookDTO> body = all.getBody();
+                ResponseEntity<List<BookDTO>> all = bookProxy.findAll();
                 Long end = System.nanoTime();
-                System.out.println("Tempo passado no metodo :" + (end-start) + " nanossegundos");
-                System.out.println("Tempo passado no metodo segundos :" + (end-start)*(Math.pow(10, -9)) + "s");
-
-                System.out.println("------------");
-                System.out.println("Agora dentro do processo");
-                System.out.println("------------");
-
-                bookProxy.findAllTimeProcessed();
+                log.info("Tempo passado no metodo :" + (end-start) + " nanossegundos");
+//
+//                System.out.println("------------");
+//                System.out.println("Agora dentro do processo");
+//                System.out.println("------------");
+//
+//                bookProxy.findAllTimeProcessed();
 
                 break;
             case PUT:
@@ -94,8 +97,31 @@ public class KafkaMessageConsumer {
         }
     }
 
-    private void processCambioRequest(MessageConsumerDTO message){
-
+    private void processCambioRequest(MessageConsumerDTO messageCambio){
+        switch (messageCambio.getType()){
+            case GET:
+                //todo something
+                System.out.println("GET");
+                ResponseEntity<List<Cambio>> all = cambioProxy.findAll();
+                Long start = System.nanoTime();
+                Long end = System.nanoTime();
+                log.info("Tempo passado no metodo :" + (end-start) + " nanossegundos");
+                break;
+            case PUT:
+                //todo something
+                System.out.println("PUT");
+                break;
+            case POST:
+                //todo something]
+                System.out.println("POST");
+                break;
+            case DELETE:
+                //todo something
+                System.out.println("DELETE");
+                break;
+            default:
+                System.out.println("Erro nao encontrado");
+        }
     }
 
 }
