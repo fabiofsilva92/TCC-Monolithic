@@ -3,7 +3,8 @@
 
 ## Como realizar os testes do kafka com microsservice e monolitico
 
-	Para realizar os testes é necessário ter o Docker desktop e Postman instalado na sua maquina, a partir disso devemos seguir os seguintes passos : 
+	Para realizar os testes é necessário ter o Docker desktop e Postman instalado na sua maquina,
+	a partir disso devemos seguir os seguintes passos : 
 
 
 	Subir instancia do mysql e kafka no docker utilizando o seguinte docker-compose.
