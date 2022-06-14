@@ -12,7 +12,7 @@
 		 - https://gist.github.com/fabiofsilva92/2141a7a7e67743ce8d7035b964fcd97a
 		Para realizar o procedimento, devemos copiar as configurações que se encontram no link acima,
 		colar em um arquivo nomeado como  docker-compose.yml, após isso abrir o cmd no caminho onde se encontra este arquivo,
-		após isso executar o comando : docker-compose up
+		então executar o comando: docker-compose up
 		Após esse procedimento o docker irá conter o banco de dados necessário para rodar a aplicação e também o kafka e suas configurações.
 		Certifique-se que os containeres estão rodando(é possivel conferir olhando o docker desktop os containers que estão ativos).
 		
