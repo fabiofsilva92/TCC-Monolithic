@@ -23,10 +23,6 @@ public class CambioService {
         return this.cambioRepository.findByFromAndTo(from, to);
     }
 
-    public List<Cambio> getAll(){
-        return this.cambioRepository.findAll();
-    }
-
     public Cambio findById(Long id) {
 
         Optional<Cambio> obj = cambioRepository.findById(id);

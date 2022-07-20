@@ -49,11 +49,11 @@ public class KafkaMessageConsumer {
 
     private void processMessage(MessageConsumerDTO message){
 
-        if(message.getService() == ServiceRequested.BOOK){
-            processBookRequest(message);
-        }else if(message.getService() == ServiceRequested.CAMBIO){
-            processCambioRequest(message);
-        }
+        if(message.getService() == ServiceRequested.BOOK) processBookRequest(message);
+        else if(message.getService() == ServiceRequested.CAMBIO) processCambioRequest(message);
+        else throw new RuntimeException("Message with problems, re-send the message");
+
+
 
 //        Long start = System.nanoTime();
 //        log.info("Initializing ProcessMessage");
@@ -65,60 +65,53 @@ public class KafkaMessageConsumer {
     }
 
     private void processBookRequest(MessageConsumerDTO message){
-        switch (message.getType()){
-            case GET:
+        switch (message.getMethod()){
+            case GET_BOOK:
                 //todo something
+
+                break;
+            case FIND_BOOK_BY_ID:
+                break;
+            case FIND_ALL_BOOK:
                 Long start = System.nanoTime();
                 ResponseEntity<List<BookDTO>> all = bookProxy.findAll();
                 Long end = System.nanoTime();
-                log.info("Tempo passado no metodo :" + (end-start) + " nanossegundos");
-//
-//                System.out.println("------------");
-//                System.out.println("Agora dentro do processo");
-//                System.out.println("------------");
-//
-//                bookProxy.findAllTimeProcessed();
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} nanossegundos", message.getMethod(), (end-start));
+//                log.info("MICROSSERVICE - Tempo passado no metodo :" + (end-start) + " nanossegundos");
+                break;
+            case CREATE_BOOK:
+                break;
+            case UPDATE_BOOK:
+                break;
+            case DELETE_BOOK:
+                break;
 
-                break;
-            case PUT:
-                //todo something
-                System.out.println("PUT");
-                break;
-            case POST:
-                //todo something]
-                System.out.println("POST");
-                break;
-            case DELETE:
-                //todo something
-                System.out.println("DELETE");
-                break;
             default:
                 System.out.println("Erro nao encontrado");
         }
     }
 
-    private void processCambioRequest(MessageConsumerDTO messageCambio){
-        switch (messageCambio.getType()){
-            case GET:
+    private void processCambioRequest(MessageConsumerDTO message){
+        switch (message.getMethod()){
+            case GET_CAMBIO:
+                break;
+            case FIND_CAMBIO_BY_ID:
+                break;
+            case FIND_ALL_CAMBIO:
                 //todo something
-                System.out.println("GET");
-                ResponseEntity<List<Cambio>> all = cambioProxy.findAll();
                 Long start = System.nanoTime();
+                ResponseEntity<List<Cambio>> all = cambioProxy.findAll();
                 Long end = System.nanoTime();
-                log.info("Tempo passado no metodo :" + (end-start) + " nanossegundos");
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} nanossegundos", message.getMethod(), (end-start));
+//                log.info("Tempo passado no metodo :" + (end-start) + " nanossegundos");
                 break;
-            case PUT:
-                //todo something
-                System.out.println("PUT");
+            case CREATE_CAMBIO:
                 break;
-            case POST:
-                //todo something]
-                System.out.println("POST");
+            case UPDATE_CAMBIO:
                 break;
-            case DELETE:
-                //todo something
-                System.out.println("DELETE");
+            case DELETE_CAMBIO:
                 break;
+
             default:
                 System.out.println("Erro nao encontrado");
         }

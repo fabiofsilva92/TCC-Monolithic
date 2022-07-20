@@ -1,9 +1,11 @@
 package fatec.br.tccmonolitico.dtos;
 
+import fatec.br.tccmonolitico.dtos.enums.MethodRequested;
 import fatec.br.tccmonolitico.dtos.enums.ServiceRequested;
-import fatec.br.tccmonolitico.dtos.enums.TypeOfRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -11,7 +13,8 @@ public class MessageConsumerDTO {
 
     private String id;
     private ServiceRequested service;
-    private TypeOfRequest type;
+    private MethodRequested method;
+    private List<Object> params;
 
 }
 
