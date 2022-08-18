@@ -3,9 +3,12 @@ package fatec.br.tccmonolitico.consumer;
 import fatec.br.tccmonolitico.dtos.BookDTO;
 import fatec.br.tccmonolitico.dtos.MessageConsumerDTO;
 import fatec.br.tccmonolitico.dtos.enums.ServiceRequested;
+import fatec.br.tccmonolitico.entities.Book;
 import fatec.br.tccmonolitico.entities.Cambio;
+import fatec.br.tccmonolitico.entities.Transaction;
 import fatec.br.tccmonolitico.proxy.BookProxy;
 import fatec.br.tccmonolitico.proxy.CambioProxy;
+import fatec.br.tccmonolitico.services.TransactionService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -34,57 +40,140 @@ public class KafkaMessageConsumer {
     @Autowired
     private CambioProxy cambioProxy;
 
+    @Autowired
+    private TransactionService transactionService;
+
     private static final Logger log = LoggerFactory.getLogger(KafkaMessageConsumer.class);
 
     @KafkaListener(topics = "${topic.name}", groupId = "${spring.kafka.consumer.group-id}")
     public void listenTopicLogs(ConsumerRecord<String, MessageConsumerDTO> record){
-//        log.info("Received message partition: "+record.partition());
         log.info("Received message: "+record.value());
         processMessage(record.value());
-//        Object valor = record.value();
-//        MessageConsumerDTO mensagem = (MessageConsumerDTO) valor;
-//        log.info("Received message: "+((MessageConsumerDTO) record.value()).getType());
-//        log.info("SEGUNDA MENSAGEM NESSE CARALHO: "+mensagem.getSecondMessage());
     }
 
     private void processMessage(MessageConsumerDTO message){
 
-        if(message.getService() == ServiceRequested.BOOK) processBookRequest(message);
-        else if(message.getService() == ServiceRequested.CAMBIO) processCambioRequest(message);
-        else throw new RuntimeException("Message with problems, re-send the message");
-
-
-
-//        Long start = System.nanoTime();
-//        log.info("Initializing ProcessMessage");
-//        System.out.println(message.toString());
-//        Long end = System.nanoTime();
-//        System.out.println("Tempo passado no metodo :" + (end-start) + "nanossegundos");
-//        System.out.println("Tempo passado no metodo segundos :" + (end-start)*(Math.pow(10, -9)) + "s");
+        if(message.getService() == ServiceRequested.BOOK){
+            processBookRequest(message);
+        }else if(message.getService() == ServiceRequested.CAMBIO){
+            processCambioRequest(message);
+        }
 
     }
 
     private void processBookRequest(MessageConsumerDTO message){
-        switch (message.getMethod()){
-            case GET_BOOK:
-                //todo something
+        switch (message.getMethod()) {
 
+            case GET_BOOK:
+                //TODO
                 break;
-            case FIND_BOOK_BY_ID:
-                break;
-            case FIND_ALL_BOOK:
-                Long start = System.nanoTime();
-                ResponseEntity<List<BookDTO>> all = bookProxy.findAll();
-                Long end = System.nanoTime();
-                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} nanossegundos", message.getMethod(), (end-start));
-//                log.info("MICROSSERVICE - Tempo passado no metodo :" + (end-start) + " nanossegundos");
-                break;
-            case CREATE_BOOK:
-                break;
-            case UPDATE_BOOK:
-                break;
+
+            //Book CRUD
+            case FIND_BOOK_BY_ID:{
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    BookDTO byId = bookProxy.findById(1l);
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end - start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(), message.getMethod().toString());
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end - start));
+            }
+            break;
+
+            case FIND_ALL_BOOK: {
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    List<BookDTO> all = bookProxy.findAll();
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end-start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(),message.getMethod().toString());
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end-start));
+            }
+            break;
+
+            case CREATE_BOOK: {
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    BookDTO bookDTO = bookProxy.create(getMoockBook());
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end-start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(),message.getMethod().toString());
+
+                deleteBookMocks();
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end-start));
+            }
+            break;
+
+            case UPDATE_BOOK: {
+
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    BookDTO bookDTO = bookProxy.create(getMoockBook());
+                }
+                List<Book> listMock = getListMock();
+
+
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < listMock.size(); i++) {
+                    listMock.get(i).setTitle("Mock update");
+                    bookProxy.update(listMock.get(i).getId(), listMock.get(i));
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end-start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(),message.getMethod().toString());
+
+                deleteBookMocks();
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end-start));
+            }
+            break;
+
             case DELETE_BOOK:
-                break;
+            {
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    BookDTO bookDTO = bookProxy.create(getMoockBook());
+                }
+                List<Book> listMock = getListMock();
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < listMock.size(); i++) {
+                    bookProxy.delete(listMock.get(i).getId());
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end-start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(),message.getMethod().toString());
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end-start));
+            }
+            break;
 
             default:
                 System.out.println("Erro nao encontrado");
@@ -94,27 +183,180 @@ public class KafkaMessageConsumer {
     private void processCambioRequest(MessageConsumerDTO message){
         switch (message.getMethod()){
             case GET_CAMBIO:
+                //TODO
                 break;
             case FIND_CAMBIO_BY_ID:
-                break;
-            case FIND_ALL_CAMBIO:
-                //todo something
-                Long start = System.nanoTime();
-                ResponseEntity<List<Cambio>> all = cambioProxy.findAll();
-                Long end = System.nanoTime();
-                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} nanossegundos", message.getMethod(), (end-start));
-//                log.info("Tempo passado no metodo :" + (end-start) + " nanossegundos");
-                break;
+            {
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    Cambio byId = cambioProxy.findById(1l);
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end - start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(), message.getMethod().toString());
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end - start));
+            }
+            break;
+            case FIND_ALL_CAMBIO: {
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    List<Cambio> all = cambioProxy.findAll();
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end - start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(), message.getMethod().toString());
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISEGUNDOS", message, (end - start));
+            }
+            break;
             case CREATE_CAMBIO:
-                break;
-            case UPDATE_CAMBIO:
-                break;
+            {
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    Cambio cambio = cambioProxy.create(getMoockCambio());
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end-start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(),message.getMethod().toString());
+
+                deleteCambioMoocks();
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end-start));
+            }
+            break;
+            case UPDATE_CAMBIO: {
+
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    Cambio cambio = cambioProxy.create(getMoockCambio());
+                }
+                List<Cambio> listMock = getListCambioMock();
+
+
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < listMock.size(); i++) {
+                    listMock.get(i).setFrom("BRL");
+                    cambioProxy.update(listMock.get(i).getId(), listMock.get(i));
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end - start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(), message.getMethod().toString());
+
+                deleteCambioMoocks();
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end - start));
+            }
+            break;
             case DELETE_CAMBIO:
-                break;
+            {
+                for (int i = 0; i < message.getRepetitions(); i++) {
+                    Cambio cambio = cambioProxy.create(getMoockCambio());
+                }
+                List<Cambio> listMock = getListCambioMock();
+                String initialTime = LocalDateTime.now().toString();
+                Long start = System.currentTimeMillis();
+                for (int i = 0; i < listMock.size(); i++) {
+                    cambioProxy.delete(listMock.get(i).getId());
+                }
+                Long end = System.currentTimeMillis();
+                String endTime = LocalDateTime.now().toString();
+                Long timeLapsed = end-start;
+
+                registerTransaction(initialTime,
+                        endTime, timeLapsed.toString(), 0,
+                        message.getRepetitions(),message.getMethod().toString());
+
+                log.info("MICROSSERVICE \t Method requested {} \t Time elapsed {} MILISSEGUNDOS", message.getMethod(), (end-start));
+            }
+            break;
 
             default:
                 System.out.println("Erro nao encontrado");
         }
+    }
+
+    private void deleteCambioMoocks() {
+        try{
+            cambioProxy.deletemocks();
+        }catch (Exception ex){
+            log.info("Error "+ex.getMessage());
+        }
+    }
+
+    private Cambio getMoockCambio() {BigDecimal conversionFactor = new BigDecimal(135.78);
+        Cambio cambio = new Cambio("USD", "MCK", 135.78d);
+        return cambio;
+    }
+
+    private Book getMoockBook() {
+
+        Date date = new Date();
+
+        Book book = new Book("Autor mock","titulo mock", date, 100d, "USD", "environment");
+
+        return book;
+
+    }
+
+    private void deleteBookMocks() {
+        try{
+            bookProxy.deletemocks();
+        }catch (Exception ex){
+            log.info("Error "+ex.getMessage());
+        }
+    }
+
+    private List<Book> getListMock(){
+        try{
+            List<Book> mocks = bookProxy.getMocks();
+            return mocks;
+        }catch (Exception ex){
+            log.info("Error "+ex.getMessage());
+        }
+        return null;
+    }
+
+    private List<Cambio> getListCambioMock() {
+        try{
+            List<Cambio> mocks = cambioProxy.getMocks();
+            return mocks;
+        }catch (Exception ex){
+            log.info("Error "+ex.getMessage());
+        }
+        return null;
+    }
+
+
+    private void registerTransaction(String initialTime, String endTime, String timeLapsed, Integer level, Integer repetitions, String method) {
+        timeLapsed = timeLapsed+"ms";
+
+        Transaction transactionBuilder = Transaction.builder()
+                .initialTime(initialTime)
+                .endTime(endTime)
+                .timeLapsed(timeLapsed.toString())
+                .repetitions(repetitions)
+                .method(method).build();
+
+        transactionService.addTransaction(transactionBuilder);
     }
 
 }

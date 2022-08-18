@@ -3,6 +3,7 @@ package fatec.br.tccmonolitico.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 
 @Entity(name = "cambio")
@@ -38,6 +39,15 @@ public class Cambio implements Serializable {
                   String environment) {
         super();
         this.id = id;
+        this.from = from;
+        this.to = to;
+        this.conversionFactor = conversionFactor;
+        this.convertedValue = convertedValue;
+        this.environment = environment;
+    }
+
+    public Cambio(String from, String to, Double conversionFactor) {
+        super();
         this.from = from;
         this.to = to;
         this.conversionFactor = conversionFactor;
