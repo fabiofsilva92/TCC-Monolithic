@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@FeignClient(url="http://localhost:8081", name="book-service-mono")
+
+@FeignClient(url="${aws.nomePodBookService}", name="book-service-mono")
 public interface BookProxy {
 
     @GetMapping(value = "/book-service-mono/{id}")

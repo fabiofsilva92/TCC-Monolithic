@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import javax.validation.Valid;
 import java.util.List;
 
-@FeignClient(url = "http://localhost:8081",name = "cambio-service-mono")
+@FeignClient(url="${aws.nomePodCambioService}", name = "cambio-service-mono")
 public interface CambioProxy {
 
     @GetMapping(value = "/cambio-service-mono/{amount}/{from}/{to}")

@@ -4,6 +4,11 @@ server:
 topic:
   name: test2
 
+//Colocar o nome do pod do MS para usar no feing, nesse caso o nome deste mesmo pod
+aws:
+  nomePodBookService: ${ec2-54-196-166-104.compute-1.amazonaws.com:8081}
+  nomePodCambioService: ${ec2-54-196-166-104.compute-1.amazonaws.com:8081}
+
 spring:
   application:
     name: tcc-monolito
@@ -18,11 +23,11 @@ spring:
             value:
               default:
                 type: fatec.br.tccmonolitico.dtos.MessageConsumerDTO
-    bootstrap-servers: localhost:9091
+    bootstrap-servers: ec2-18-234-142-221.compute-1.amazonaws.com:9091
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3336/tcc_monolito?createDatabaseIfNotExist=True&useTimezone=true&serverTimezone=UTC
+    url: jdbc:mysql://ec2-44-203-164-111.compute-1.amazonaws.com:3336/tcc_monolito?createDatabaseIfNotExist=True&useTimezone=true&serverTimezone=UTC
     username: root
     password:
   jackson:
@@ -37,7 +42,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
   flyway:
-    url: jdbc:mysql://localhost:3336/
+    url: jdbc:mysql://ec2-44-203-164-111.compute-1.amazonaws.com:3336/
     schemas: tcc_monolito
     user: root
     password:
