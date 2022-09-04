@@ -4,7 +4,7 @@ server:
 topic:
   name: test2
 
-#Colocar o nome do pod do MS para usar no feing, nesse caso o nome deste mesmo pod
+#Colocar o nome do pod do MS para usar no feing, nesse caso o nome deste mesmo pod sempre que startar o pod
 aws:
   nomePodBookService: ec2-18-204-226-6.compute-1.amazonaws.com:8081
   nomePodCambioService: ec2-18-204-226-6.compute-1.amazonaws.com:8081
