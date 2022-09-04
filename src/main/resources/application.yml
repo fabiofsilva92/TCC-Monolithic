@@ -4,10 +4,23 @@ server:
 topic:
   name: test2
 
-//Colocar o nome do pod do MS para usar no feing, nesse caso o nome deste mesmo pod
+#Colocar o nome do pod do MS para usar no feing, nesse caso o nome deste mesmo pod
 aws:
   nomePodBookService: ${ec2-54-196-166-104.compute-1.amazonaws.com:8081}
   nomePodCambioService: ${ec2-54-196-166-104.compute-1.amazonaws.com:8081}
+
+
+#POST localhost:8081/actuator/shutdown vai finalizar a aplicação
+#Enable shutdown endpoint
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 
 spring:
   application:
