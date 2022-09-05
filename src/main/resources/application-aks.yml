@@ -1,0 +1,62 @@
+server:
+  port: 8082
+
+topic:
+  name: test2
+
+#Colocar o nome do pod do MS para usar no feing, nesse caso o nome deste mesmo pod sempre que startar o pod
+aws:
+  nomePodBookService: ec2-18-204-226-6.compute-1.amazonaws.com:8081
+  nomePodCambioService: ec2-18-204-226-6.compute-1.amazonaws.com:8081
+
+
+#POST localhost:8081/actuator/shutdown vai finalizar a aplicação
+#Enable shutdown endpoint
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+
+spring:
+  application:
+    name: tcc-monolito
+
+  kafka:
+    consumer:
+      group-id: worker2
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            value:
+              default:
+                type: fatec.br.tccmonolitico.dtos.MessageConsumerDTO
+    bootstrap-servers: ec2-3-86-85-184.compute-1.amazonaws.com:9091
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://ec2-3-83-249-155.compute-1.amazonaws.com:3336/tcc_monolito?createDatabaseIfNotExist=True&useTimezone=true&serverTimezone=UTC
+    username: root
+    password:
+  jackson:
+    default-property-inclusion: NON_NULL
+    serialization:
+      fail-on-empty-beans: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  flyway:
+    url: jdbc:mysql://ec2-3-83-249-155.compute-1.amazonaws.com:3336/
+    schemas: tcc_monolito
+    user: root
+    password:
+    locations: classpath:db/migration
